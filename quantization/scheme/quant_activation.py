@@ -28,12 +28,12 @@ def _update_stats(t: t_Float32Tensor,
 
 
 @torch.inference_mode()
-def calibrate_activation_stats(model: nn.Module,
-                               data_loader: DataLoader,
-                               policy: int,
-                               max_batches: Optional[int] = None,
-                               max_samples: Optional[int] = None,
-                               device: str = "cuda") -> Tuple[t_stats, t_stats]:
+def calibrate_activations(model: nn.Module,
+                          data_loader: DataLoader,
+                          policy: int,
+                          max_batches: Optional[int] = None,
+                          max_samples: Optional[int] = None,
+                          device: str = "cuda") -> Tuple[t_stats, t_stats]:
     """
     Return activation stats which is a dict mapping layer names to
     its input and output stats:
@@ -60,7 +60,7 @@ def calibrate_activation_stats(model: nn.Module,
         _update_stats(inputs, module_name, range_fn, input_stats)
         _update_stats(outputs, module_name, range_fn, output_stats)
 
-    # TODO: Add more type of module
+    # TODO: Add more module types
     modules_to_record = (nn.Conv2d, nn.Linear, nn.ReLU, nn.LeakyReLU)
 
     all_hooks = []

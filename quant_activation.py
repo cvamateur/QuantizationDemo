@@ -32,7 +32,7 @@ def main(args):
     policy_activation = q.Q_SYMMETRICAL | q.RANGE_ABSOLUTE
     bitwidth: int = 8
 
-    stats_inp, stats_out = q.calibrate_activation_stats(model, ds_valid, policy_activation)
+    stats_inp, stats_out = q.calibrate_activations(model, ds_valid, policy_activation)
     print(stats_inp)
     print(stats_out)
 

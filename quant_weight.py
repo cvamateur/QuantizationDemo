@@ -43,8 +43,6 @@ def main(args):
             # qw, s, z = q.linear_quantize_weight_per_channel(m.weight, bitwidth, dim=0)
             plot_weight_distribution(qw, name, bitwidth)
 
-            qb, s, z = q.linear_quantize(m.bias, bitwidth, policy_bias, s, z)
-
 
 if __name__ == '__main__':
     args = get_parser().parse_args()

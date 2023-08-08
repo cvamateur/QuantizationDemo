@@ -4,4 +4,4 @@ from .quant_bias import linear_quantize_bias
 from .quant_bias import shift_quantized_bias_fc
 from .quant_bias import shift_quantized_bias_conv
 from .quant_bias import shift_quantized_bias_separable
-from .quant_activation import calibrate_activation_stats
+from .quant_activation import calibrate_activations

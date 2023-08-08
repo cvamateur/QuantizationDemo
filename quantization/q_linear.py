@@ -3,15 +3,12 @@ from typing import Union, Optional, Tuple
 from .defs import *
 
 
-def get_quantization_constants(tensor: t_Float32Tensor,
-                               qc: QuantConfig,
-                               r_min: Optional[float] = None,
-                               r_max: Optional[float] = None) -> Tuple[float, int]:
+def get_quantization_constants(qc: QuantConfig,
+                               r_min: float,
+                               r_max: float) -> Tuple[float, int]:
     """
     Get quantization scale and zero_point for single tensor.
     """
-    if r_min is None or r_max is None:
-        r_min, r_max = qc.range_fn(tensor, qc.symmetric)
     q_min, q_max = qc.q_min, qc.q_max
     scale = (r_max - r_min) / (q_max - q_min)
     zero_point = q_min - r_min / scale
@@ -31,7 +28,8 @@ def get_quantization_constants_per_channel(tensor: t_Float32Tensor,
     zero_point = tensor.new_zeros([num_channels], dtype=t_int32)
     for i in range(num_channels):
         subtensor_i = tensor.select(qc.channel_dim, i)
-        scale_i, zero_point_i = get_quantization_constants(subtensor_i, qc)
+        r_min, r_max = qc.range_fn(subtensor_i, qc.symmetric)
+        scale_i, zero_point_i = get_quantization_constants(qc, r_min, r_max)
         scale[i] = scale_i
         zero_point[i] = zero_point_i
     scale_shape = [1] * tensor.dim()
@@ -133,7 +131,8 @@ def linear_quantize(tensor: t_Float32Tensor,
         if qc.per_channel:
             scale, zero_point = get_quantization_constants_per_channel(tensor, qc)
         else:
-            scale, zero_point = get_quantization_constants(tensor, qc)
+            r_min, r_max = qc.range_fn(tensor, qc.symmetric)
+            scale, zero_point = get_quantization_constants(qc, r_min, r_max)
     assert scale is not None and zero_point is not None
 
     quantized_tensor = linear_quantize_asymmetric(tensor, scale, zero_point, qc, dtype)
