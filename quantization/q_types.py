@@ -23,5 +23,5 @@ t_shift = int
 
 t_scale_fn = Callable[[t_Float32Tensor, Union[float, t_Float32Tensor]], t_Float32Tensor]
 t_round_fn = Callable[[t_Float32Tensor], t_Float32Tensor]
-t_range_fn = Callable[[t_Float32Tensor, bool], Tuple[float, float]]
+t_range_fn = Callable[[t_Float32Tensor, Optional[bool]], Tuple[float, float]]
 t_device = torch.device

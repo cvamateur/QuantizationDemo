@@ -4,11 +4,14 @@ from .defs import *
 
 
 def get_quantization_constants(tensor: t_Float32Tensor,
-                               qc: QuantConfig) -> Tuple[float, int]:
+                               qc: QuantConfig,
+                               r_min: Optional[float] = None,
+                               r_max: Optional[float] = None) -> Tuple[float, int]:
     """
     Get quantization scale and zero_point for single tensor.
     """
-    r_min, r_max = qc.range_fn(tensor, qc.symmetric)
+    if r_min is None or r_max is None:
+        r_min, r_max = qc.range_fn(tensor, qc.symmetric)
     q_min, q_max = qc.q_min, qc.q_max
     scale = (r_max - r_min) / (q_max - q_min)
     zero_point = q_min - r_min / scale

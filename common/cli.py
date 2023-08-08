@@ -12,7 +12,7 @@ def get_parser():
 
     parser.add_argument("--factor", type=float, default=1.0, help="Factor of model width")
 
-    parser.add_argument("--num-workers", type=int, default=4, help="Number workers for dataset")
+    parser.add_argument("--num-workers", type=int, default=0, help="Number workers for dataset")
     parser.add_argument("--batch-size", type=int, default=64, metavar="N")
     parser.add_argument("--num-epochs", type=int, default=20, metavar="N")
     parser.add_argument("--lr", type=float, default=1e-3, metavar="LR")

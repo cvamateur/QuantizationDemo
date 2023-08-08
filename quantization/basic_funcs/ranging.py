@@ -40,7 +40,7 @@ def range_absolute_minmax(t: t_Float32Tensor, symmetrical: bool = False) -> Tupl
 
 
 @RANGE_REGISTER(RANGE_QUANTILE)
-def range_quantile_max(t: t_Float32Tensor, symmetric: bool = True) -> Tuple[float, float]:
+def range_quantile_max(t: t_Float32Tensor, symmetrical: bool = True) -> Tuple[float, float]:
     """
     Quantile range policy:
         r_min = -r_max
@@ -53,5 +53,5 @@ def range_quantile_max(t: t_Float32Tensor, symmetric: bool = True) -> Tuple[floa
 
 
 @RANGE_REGISTER(RANGE_KL_DIVERGENCE)
-def range_kl_divergence(t: t_Float32Tensor, symmetric: bool = True) -> Tuple[float, float]:
+def range_kl_divergence(t: t_Float32Tensor, symmetrical: bool = True) -> Tuple[float, float]:
     raise NotImplementedError
