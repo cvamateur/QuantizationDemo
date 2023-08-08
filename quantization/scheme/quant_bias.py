@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from ..defs import *
-from ..q_linear import linear_quantize_asymmetric
+from ..q_linear import linear_quantize_asymmetric, linear_quantize
 
 
 def linear_quantize_bias(bias: t_Float32Tensor,
@@ -14,6 +14,8 @@ def linear_quantize_bias(bias: t_Float32Tensor,
     in such case, the function performs a symmetrical per_channel quantization.
 
     The scale of bias is set to S_input * S_weight, which is required by hardware.
+    Same as:
+        linear_quantize(bias, bitwidth, Q_SYMMETRICAL, bias_scale, 0)[0]
     """
     assert (bias.dim() == 1 and bias.dtype == t_float32)
     if isinstance(input_scale, t_Tensor):
