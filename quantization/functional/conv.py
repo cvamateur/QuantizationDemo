@@ -21,14 +21,13 @@ def quantized_conv2d(input: t_Int8Tensor,
                      padding: Tuple[int, int, int, int],
                      dilation: Union[int, Tuple[int, ...]] = 1,
                      groups: int = 1) -> t_Int8Tensor:
-
     assert (len(padding) == 4)
     assert (input.dtype == t_int8)
     assert (weight.dtype == input.dtype)
     assert (bias is None or bias.dtype == t_int32)
 
     # integer based 2d conv (8-bit multiplication and 32 accumulation)
-    input = F.pad(input, padding, "contant", input_zero_point)
+    input = F.pad(input, padding, "constant", input_zero_point)
     if "cpu" in input.device.type:
         output = F.conv2d(input.to(t_int32), weight.to(t_int32), None, stride, 0, dilation, groups)
     else:
@@ -45,3 +44,18 @@ def quantized_conv2d(input: t_Int8Tensor,
 
     return output
 
+
+def shift_quantized_bias_conv(quant_bias: t_Int32Tensor,
+                              quant_weight: t_Int8Tensor,
+                              input_zero_point: int) -> t_Int32Tensor:
+    assert (quant_bias.dtype == t_int32), "error: bias must be of type int32"
+    assert (isinstance(input_zero_point, int))
+    return quant_bias - quant_weight.sum((1, 2, 3)).to(t_int32) * input_zero_point
+
+
+def shift_quantized_bias_separable(quant_bias: t_Int32Tensor,
+                                   quant_weight: t_Int8Tensor,
+                                   input_zero_point: int) -> t_Int32Tensor:
+    assert (quant_bias.dtype == t_int32), "error: bias must be of type int32"
+    assert (isinstance(input_zero_point, int))
+    return quant_bias - quant_weight.sum((2, 3)).to(t_int32) * input_zero_point

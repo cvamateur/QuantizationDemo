@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from ..q_types import t_Float32Tensor, t_range_fn, t_stats
 from ..q_policy import DECODE_RANGING
-from ..funcs import RANGE_REGISTER
+from ..functional import RANGE_REGISTER
 
 
 def _update_stats(t: t_Float32Tensor,
@@ -114,3 +114,14 @@ def dump_stats(stats: t_stats,
     
 def dumps_stats(stats: t_stats, indent: Optional[int] = None) -> str:
     return json.dumps(stats, indent=indent)
+
+
+def load_stats(path: str) -> t_stats:
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"error: file not fount: {path}")
+    with open(path, 'r') as f:
+        return json.load(f)
+
+
+def loads_stats(stats_str: str) -> t_stats:
+    return json.loads(stats_str)

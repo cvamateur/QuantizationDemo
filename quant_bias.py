@@ -5,6 +5,7 @@ from common.dataloader import get_mnist_dataloader, get_cifar10_dataset
 from common.cli import get_parser
 
 import quantization as q
+import quantization.functional as qf
 
 USE_GPU = torch.cuda.is_available()
 DEVICE = torch.device("cuda" if USE_GPU else "cpu")
@@ -15,15 +16,7 @@ ckpt_path = r"./ckpt/best.pth"
 USE_VGG = True
 
 
-def fuse_conv_bn(conv, bn):
-    # modified from https://mmcv.readthedocs.io/en/latest/_modules/mmcv/cnn/utils/fuse_conv_bn.html
-    assert conv.bias is None
 
-    factor = bn.weight.data / torch.sqrt(bn.running_var.data + bn.eps)
-    conv.weight.data = conv.weight.data * factor.reshape(-1, 1, 1, 1)
-    conv.bias = nn.Parameter(- bn.running_mean.data * factor + bn.bias.data)
-
-    return conv
 
 def main(args):
     criterion = torch.nn.CrossEntropyLoss()
@@ -39,7 +32,7 @@ def main(args):
         while ptr < len(model.backbone):
             if isinstance(model.backbone[ptr], nn.Conv2d) and \
                     isinstance(model.backbone[ptr + 1], nn.BatchNorm2d):
-                fused_backbone.append(fuse_conv_bn(
+                fused_backbone.append(qf.fuse_conv_bn(
                     model.backbone[ptr], model.backbone[ptr + 1]))
                 ptr += 2
             else:

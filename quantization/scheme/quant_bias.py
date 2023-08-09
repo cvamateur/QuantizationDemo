@@ -33,17 +33,5 @@ def linear_quantize_bias(bias: t_Float32Tensor,
     return quantized_bias, bias_scale, 0
 
 
-def shift_quantized_bias_fc(quant_bias: t_Int32Tensor,
-                            quant_weight: t_Int8Tensor,
-                            input_zero_point: int) -> t_Int32Tensor:
-    assert (quant_bias.dtype == t_int32), "error: bias must be of type int32"
-    assert (isinstance(input_zero_point, int))
-    return quant_bias - quant_weight.sum(1).to(t_int32) * input_zero_point
 
 
-def shift_quantized_bias_separable(quant_bias: t_Int32Tensor,
-                                   quant_weight: t_Int8Tensor,
-                                   input_zero_point: int) -> t_Int32Tensor:
-    assert (quant_bias.dtype == t_int32), "error: bias must be of type int32"
-    assert (isinstance(input_zero_point, int))
-    return quant_bias - quant_weight.sum((2, 3)).to(t_int32) * input_zero_point

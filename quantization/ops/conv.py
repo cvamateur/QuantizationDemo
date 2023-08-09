@@ -2,15 +2,9 @@ import torch
 import torch.nn as nn
 
 from ..q_types import *
-from ..funcs import quantized_conv2d
+from ..functional import quantized_conv2d
 
 
-def shift_quantized_bias_conv(quant_bias: t_Int32Tensor,
-                              quant_weight: t_Int8Tensor,
-                              input_zero_point: int) -> t_Int32Tensor:
-    assert (quant_bias.dtype == t_int32), "error: bias must be of type int32"
-    assert (isinstance(input_zero_point, int))
-    return quant_bias - quant_weight.sum((1, 2, 3)).to(t_int32) * input_zero_point
 
 
 class QuantizedConv2d(nn.Module):
@@ -37,7 +31,7 @@ class QuantizedConv2d(nn.Module):
         self.output_zero_point = output_zero_point
 
         self.input_scale = input_scale
-        self.weight_scale = weight_scale
+        self.register_buffer("weight_scale", weight_scale)
         self.output_scale = output_scale
 
         self.stride = stride
