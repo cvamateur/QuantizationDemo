@@ -5,14 +5,16 @@ from .q_types import t_round_fn
 from .q_types import t_range_fn
 
 """
-index   num bits    meaning
-    0       1       asymmetrical(0) / symmetrical(1)
-    1       1       linear(0) / non-linear(1)
-    2       1       per-tensor(0) / per-channel(1)
-    3       1       normal(0) / pow-of-two(1)
-  4-7       4       rounding policy
- 8-11       4       ranging policy
-   15       1       signed(0) / unsigned(1)
+policy is a int32 number where following bits are used:
+
+    index   num bits    meaning
+        0       1       asymmetrical(0) / symmetrical(1)
+        1       1       linear(0) / non-linear(1)
+        2       1       per-tensor(0) / per-channel(1)
+        3       1       normal(0) / pow-of-two(1)
+      4-7       4       rounding policy
+     8-11       4       ranging policy
+       15       1       signed(0) / unsigned(1)
 """
 
 #############################
@@ -25,8 +27,8 @@ Q_NO_LINEAR = 2  # not supported
 Q_PER_TENSOR = 0
 Q_PER_CHANNEL = 4
 Q_POWER_OF_TWO = 8
-Q_SIGNED = 0
-Q_UNSIGNED = 32768
+Q_SIGN = 0
+Q_UNSIGN = 32768
 
 #########################
 #### Rounding Policy ####
@@ -63,7 +65,7 @@ class QuantConfig(NamedTuple):
 
 def make_policy(bitwidth: int, policy: int, channel_dim: int = 0):
     from quantization import Q_MIN, Q_MAX, RANGE_REGISTER, ROUND_REGISTER
-    from quantization.basic_funcs import pow_of_two
+    from quantization.funcs import pow_of_two
 
     symmetrical = policy & Q_SYMMETRICAL
     signed = ((policy >> 15) & 1) == 0

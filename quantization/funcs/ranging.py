@@ -15,14 +15,6 @@ from ..q_types import t_Float32Tensor
 RANGE_REGISTER = PolicyRegister("Range")
 
 
-def Q_MIN(b: int, sign: int = True) -> int:
-    return -(1 << (b - 1)) if sign else 0
-
-
-def Q_MAX(b: int, sign: int = True) -> int:
-    return ((1 << (b - 1)) - 1) if sign else ((1 << b) - 1)
-
-
 @RANGE_REGISTER(RANGE_ABSOLUTE)
 def range_absolute_minmax(t: t_Float32Tensor, symmetrical: bool = False) -> Tuple[float, float]:
     """

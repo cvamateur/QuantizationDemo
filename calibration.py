@@ -35,6 +35,9 @@ def main(args):
     pprint(stats_inp)
     pprint(stats_out)
 
+    q.dump_stats(stats_inp, "./out/stats_inputs.json", indent=2)
+    q.dump_stats(stats_out, "./out/stats_outputs.json", indent=2)
+
 
 
 if __name__ == '__main__':

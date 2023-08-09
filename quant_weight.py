@@ -27,9 +27,8 @@ def main(args):
         model.load_state_dict(torch.load(vgg_path)["state_dict"])
 
     # -------------------------------------------------
-    policy_weight = q.Q_ASYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE | q.Q_UNSIGNED
-    policy_weight = q.Q_SYMMETRICAL  | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE | q.Q_SIGNED
-    policy_bias   = q.Q_SYMMETRICAL  | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
+    policy_weight = q.Q_ASYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
+    policy_weight = q.Q_SYMMETRICAL  | q.Q_PER_CHANNEL | q.RANGE_QUANTILE
 
     bitwidth = 4
 
@@ -37,12 +36,10 @@ def main(args):
     for i, (name, m) in enumerate(model.named_modules()):
         if isinstance(m, torch.nn.Conv2d):
             res = q.linear_quantize(m.weight, bitwidth, policy_weight, dim=0)
-            plot_tensor_histogram(m.weight, name, res.qc)
+            plot_tensor_histogram(m.weight, name, 32)
             plot_tensor_statistics(m.weight, name, dim=0)
             # qw, s, z = q.linear_quantize_weight_per_channel(m.weight, bitwidth, dim=0)
-            plot_tensor_histogram(res.quantized_tensor, name, res.qc)
-
-
+            plot_tensor_histogram(res.quantized_tensor, name, bitwidth)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 from .defs import *
-from .basic_funcs import *
+from .funcs import *
 from .scheme import *
 from .ops import *
 from .q_linear import LinearQuantizedResult

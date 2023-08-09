@@ -2,27 +2,25 @@ import functools
 import json
 import os
 import torch
-import itertools
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
+from itertools import chain
 from collections import defaultdict
 from typing import Dict, Tuple, Optional, Callable
 from tqdm import tqdm
 
 from ..q_types import t_Float32Tensor, t_range_fn, t_stats
 from ..q_policy import DECODE_RANGING
-from ..basic_funcs import RANGE_REGISTER
+from ..funcs import RANGE_REGISTER
 
 
 def _update_stats(t: t_Float32Tensor,
                   name: str,
                   range_fn: t_range_fn,
                   stats: Dict[str, Dict[str, float]]):
-    min_val, max_val = range_fn(t, False)
 
-    # later will take the mean over these values to
-    # overcome outlier effects
+    min_val, max_val = range_fn(t, False)
     stats[name]["min"] += min_val
     stats[name]["max"] += max_val
 
@@ -51,14 +49,14 @@ def calibrate_activations(model: nn.Module,
             output_stats[module_name]["min"]: Same as above.
             output_stats[module_name]["max"]: Same as above.
     """
-    input_stats = defaultdict(lambda: defaultdict(float))
-    output_stats = defaultdict(lambda: defaultdict(float))
+    in_stats = defaultdict(lambda: defaultdict(float))
+    out_stats = defaultdict(lambda: defaultdict(float))
     range_fn = RANGE_REGISTER.get(policy & DECODE_RANGING)
 
     def _record_range(module, inputs, outputs, module_name):
         inputs = inputs[0]  # inputs is a tuple of length 1
-        _update_stats(inputs, module_name, range_fn, input_stats)
-        _update_stats(outputs, module_name, range_fn, output_stats)
+        _update_stats(inputs, module_name, range_fn, in_stats)
+        _update_stats(outputs, module_name, range_fn, out_stats)
 
     # TODO: Add more module types
     modules_to_record = (nn.Conv2d, nn.Linear, nn.ReLU, nn.LeakyReLU)
@@ -94,23 +92,25 @@ def calibrate_activations(model: nn.Module,
     for h in all_hooks:
         h.remove()
 
-    for stats in itertools.chain(
-            input_stats.values(), output_stats.values()):
+    for stats in chain(in_stats.values(), out_stats.values()):
         stats["min"] /= count_batches
         stats["max"] /= count_batches
 
-    return input_stats, output_stats
+    return in_stats, out_stats
 
 
-def dump_stats(stats: t_stats, path: str, exist_ok: bool = False):
-    path = os.path.expanduser(path)
+def dump_stats(stats: t_stats,
+               path: str,
+               indent: Optional[int] = None,
+               exist_ok: bool = True):
+
     if os.path.exists(path) and not exist_ok:
         raise FileExistsError(f"file already exists: {path}")
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as f:
-        json.dump(stats, f)
-
+        json.dump(stats, f, indent=indent)
+    print(f"info: saved to {path}")
     
-def dumps_stats(stats: t_stats, indent: int = 2) -> str:
+def dumps_stats(stats: t_stats, indent: Optional[int] = None) -> str:
     return json.dumps(stats, indent=indent)

@@ -26,8 +26,8 @@ from .q_policy import Q_NO_LINEAR
 from .q_policy import Q_PER_TENSOR
 from .q_policy import Q_PER_CHANNEL
 from .q_policy import Q_POWER_OF_TWO
-from .q_policy import Q_SIGNED
-from .q_policy import Q_UNSIGNED
+from .q_policy import Q_SIGN
+from .q_policy import Q_UNSIGN
 from .q_policy import ROUND_HALF_TO_EVEN
 from .q_policy import ROUND_HALF_AWAY_FROM_ZERO
 from .q_policy import ROUND_HALF_TOWARDS_ZERO
