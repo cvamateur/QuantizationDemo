@@ -19,8 +19,6 @@ DEVICE = torch.device("cuda" if USE_GPU else "cpu")
 vgg_path = r"./ckpt/vgg.cifar.pretrained.pth"
 ckpt_path = r"./ckpt/best.pth"
 
-USE_VGG = True
-
 
 def quantize_model(model: q.t_Module, calib_data) -> q.t_Module:
     policy_weight = q.Q_SYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
@@ -57,7 +55,7 @@ def quantize_model(model: q.t_Module, calib_data) -> q.t_Module:
             relu_name = f"backbone.{ptr + 1}"
 
             input_scale, input_zero_point = q.get_quantization_constants(
-                qc_x, input_stats[conv_name]["max"], input_stats[conv_name]["min"])
+                qc_x, input_stats[conv_name]["min"], input_stats[conv_name]["max"])
             output_scale, output_zero_point = q.get_quantization_constants(
                 qc_x, output_stats[relu_name]["min"], output_stats[relu_name]["max"])
 
@@ -146,29 +144,23 @@ def evaluate(model, dataloader):
 
 
 def main(args):
-    criterion = torch.nn.CrossEntropyLoss()
-    if not USE_VGG:
-        model = MNIST_Net(args.factor)
-        model.load_state_dict(torch.load(ckpt_path))
-        ds_train, ds_valid = get_mnist_dataloader(args)
-    else:
-        model = VGG()
-        model.load_state_dict(torch.load(vgg_path)["state_dict"])
-        print('Before conv-bn fusion: backbone length', len(model.backbone))
-        fused_backbone = []
-        ptr = 0
-        while ptr < len(model.backbone):
-            if isinstance(model.backbone[ptr], nn.Conv2d) and \
-                    isinstance(model.backbone[ptr + 1], nn.BatchNorm2d):
-                fused_backbone.append(qf.fuse_conv_bn(
-                    model.backbone[ptr], model.backbone[ptr + 1]))
-                ptr += 2
-            else:
-                fused_backbone.append(model.backbone[ptr])
-                ptr += 1
-        model.backbone = nn.Sequential(*fused_backbone)
-        ds_train, ds_valid = get_cifar10_dataset(args)
-        print('After conv-bn fusion: backbone length', len(model.backbone))
+    model = VGG()
+    model.load_state_dict(torch.load(vgg_path)["state_dict"])
+    print('Before conv-bn fusion: backbone length', len(model.backbone))
+    fused_backbone = []
+    ptr = 0
+    while ptr < len(model.backbone):
+        if isinstance(model.backbone[ptr], nn.Conv2d) and \
+                isinstance(model.backbone[ptr + 1], nn.BatchNorm2d):
+            fused_backbone.append(qf.fuse_conv_bn(
+                model.backbone[ptr], model.backbone[ptr + 1]))
+            ptr += 2
+        else:
+            fused_backbone.append(model.backbone[ptr])
+            ptr += 1
+    model.backbone = nn.Sequential(*fused_backbone)
+    ds_train, ds_valid = get_cifar10_dataset(args)
+    print('After conv-bn fusion: backbone length', len(model.backbone))
 
     # -------------------------------------------------
     quantized_model = quantize_model(model, ds_valid)
