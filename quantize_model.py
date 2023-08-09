@@ -114,7 +114,7 @@ def quantize_model(model: q.t_Module, calib_data) -> q.t_Module:
 
 
 @torch.inference_mode()
-def evaluate(model, dataloader):
+def evaluate(model, dataloader, quant=False):
 
     model.eval()
 
@@ -127,10 +127,10 @@ def evaluate(model, dataloader):
         targets = labels.cuda()
 
         # Quantize inputs
-        quantized_images = q.linear_quantize(images, 8, q.Q_ASYMMETRICAL)[0]
+        if quant:
+            images = q.linear_quantize(images, 8, q.Q_ASYMMETRICAL)[0]
 
-        # Inference
-        outputs = model(quantized_images)
+        outputs = model(images)
 
         # Convert logits to class indices
         outputs = outputs.argmax(dim=1)
@@ -144,8 +144,15 @@ def evaluate(model, dataloader):
 
 
 def main(args):
-    model = VGG()
+    ds_train, ds_valid = get_cifar10_dataset(args)
+
+    model = VGG().cuda()
     model.load_state_dict(torch.load(vgg_path)["state_dict"])
+
+    acc = evaluate(model, ds_valid, quant=False)
+    print(f"float32 model has accuracy={acc:.2f}%")
+
+    # Fuse BN
     print('Before conv-bn fusion: backbone length', len(model.backbone))
     fused_backbone = []
     ptr = 0
@@ -159,14 +166,13 @@ def main(args):
             fused_backbone.append(model.backbone[ptr])
             ptr += 1
     model.backbone = nn.Sequential(*fused_backbone)
-    ds_train, ds_valid = get_cifar10_dataset(args)
     print('After conv-bn fusion: backbone length', len(model.backbone))
 
     # -------------------------------------------------
     quantized_model = quantize_model(model, ds_valid)
     quantized_model = quantized_model.cuda()
 
-    acc = evaluate(quantized_model, ds_valid)
+    acc = evaluate(quantized_model, ds_valid, quant=True)
     print(f"int8 model has accuracy={acc:.2f}%")
 
 
