@@ -64,14 +64,13 @@ class QuantConfig(NamedTuple):
 
 
 def make_policy(bitwidth: int, policy: int, channel_dim: int = 0):
-    from quantization import Q_MIN, Q_MAX, RANGE_REGISTER, ROUND_REGISTER
-    from quantization.funcs import pow_of_two
+    import quantization.functional as qf
 
     symmetrical = policy & Q_SYMMETRICAL
     signed = ((policy >> 15) & 1) == 0
 
-    q_min = Q_MIN(bitwidth, signed)
-    q_max = Q_MAX(bitwidth, signed)
+    q_min = qf.Q_MIN(bitwidth, signed)
+    q_max = qf.Q_MAX(bitwidth, signed)
     if symmetrical and signed:
         q_min = -q_max
 
@@ -83,9 +82,9 @@ def make_policy(bitwidth: int, policy: int, channel_dim: int = 0):
         symmetrical,
         policy & Q_PER_CHANNEL,
         0 if channel_dim is None else channel_dim,
-        ROUND_REGISTER.get(policy & DECODE_ROUNDING),
-        RANGE_REGISTER.get(policy & DECODE_RANGING),
-        pow_of_two if policy & Q_POWER_OF_TWO else lambda x, s: x / s)
+        qf.ROUND_REGISTER.get(policy & DECODE_ROUNDING),
+        qf.RANGE_REGISTER.get(policy & DECODE_RANGING),
+        qf.pow_of_two if policy & Q_POWER_OF_TWO else lambda x, s: x / s)
 
 
 class PolicyRegister(object):

@@ -4,3 +4,5 @@ from .ranging import RANGE_REGISTER
 from .rounding import ROUND_REGISTER
 
 from .conv import quantized_conv2d
+from .fc import quantized_linear
+

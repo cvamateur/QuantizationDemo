@@ -1,0 +1,70 @@
+{
+  "backbone.conv0": {
+    "min": 0.0,
+    "max": 1.0
+  },
+  "backbone.relu0": {
+    "min": 0.0,
+    "max": 3.684612370454348
+  },
+  "backbone.conv1": {
+    "min": 0.0,
+    "max": 3.684612370454348
+  },
+  "backbone.relu1": {
+    "min": 0.0,
+    "max": 2.93415205906599
+  },
+  "backbone.conv2": {
+    "min": 0.0,
+    "max": 2.93415205906599
+  },
+  "backbone.relu2": {
+    "min": 0.0,
+    "max": 1.5545907119909923
+  },
+  "backbone.conv3": {
+    "min": 0.0,
+    "max": 1.5545907119909923
+  },
+  "backbone.relu3": {
+    "min": 0.0,
+    "max": 1.850339764967943
+  },
+  "backbone.conv4": {
+    "min": 0.0,
+    "max": 1.850339764967943
+  },
+  "backbone.relu4": {
+    "min": 0.0,
+    "max": 1.472837508488924
+  },
+  "backbone.conv5": {
+    "min": 0.0,
+    "max": 1.472837508488924
+  },
+  "backbone.relu5": {
+    "min": 0.0,
+    "max": 1.4499375995917199
+  },
+  "backbone.conv6": {
+    "min": 0.0,
+    "max": 1.4499375995917199
+  },
+  "backbone.relu6": {
+    "min": 0.0,
+    "max": 1.5180958257271693
+  },
+  "backbone.conv7": {
+    "min": 0.0,
+    "max": 1.5180958257271693
+  },
+  "backbone.relu7": {
+    "min": 0.0,
+    "max": 5.828048027478731
+  },
+  "classifier": {
+    "min": 0.0,
+    "max": 4.186601433998499
+  }
+}

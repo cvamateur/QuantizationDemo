@@ -20,7 +20,7 @@ def quantized_conv2d(input: t_Int8Tensor,
                      stride: Union[int, Tuple[int, ...]],
                      padding: Tuple[int, int, int, int],
                      dilation: Union[int, Tuple[int, ...]] = 1,
-                     groups: int = 1):
+                     groups: int = 1) -> t_Int8Tensor:
 
     assert (len(padding) == 4)
     assert (input.dtype == t_int8)
@@ -42,5 +42,6 @@ def quantized_conv2d(input: t_Int8Tensor,
     output = output.to(t_float32) * scale + output_zero_point
     output = output.round().clamp(Q_MIN(bitwidth_activation), Q_MAX(bitwidth_activation))
     output = output.to(t_int8)
+
     return output
 

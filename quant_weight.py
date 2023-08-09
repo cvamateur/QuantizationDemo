@@ -31,7 +31,6 @@ def main(args):
     policy_weight = q.Q_SYMMETRICAL  | q.Q_PER_CHANNEL | q.RANGE_QUANTILE
 
     bitwidth = 4
-
     count = 1
     for i, (name, m) in enumerate(model.named_modules()):
         if isinstance(m, torch.nn.Conv2d):
