@@ -2,6 +2,7 @@ from .defs import *
 from .basic_funcs import *
 from .scheme import *
 from .ops import *
+from .q_linear import LinearQuantizedResult
 from .q_linear import get_quantization_constants
 from .q_linear import get_quantization_constants_per_channel
 from .q_linear import linear_quantize

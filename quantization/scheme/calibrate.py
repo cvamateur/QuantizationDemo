@@ -1,4 +1,6 @@
 import functools
+import json
+import os
 import torch
 import itertools
 import torch.nn as nn
@@ -8,11 +10,9 @@ from collections import defaultdict
 from typing import Dict, Tuple, Optional, Callable
 from tqdm import tqdm
 
-from ..q_types import t_Float32Tensor, t_range_fn
-from ..q_policy import Q_SYMMETRICAL, DECODE_RANGING
+from ..q_types import t_Float32Tensor, t_range_fn, t_stats
+from ..q_policy import DECODE_RANGING
 from ..basic_funcs import RANGE_REGISTER
-
-t_stats = Dict[str, Dict[str, float]]
 
 
 def _update_stats(t: t_Float32Tensor,
@@ -100,3 +100,17 @@ def calibrate_activations(model: nn.Module,
         stats["max"] /= count_batches
 
     return input_stats, output_stats
+
+
+def dump_stats(stats: t_stats, path: str, exist_ok: bool = False):
+    path = os.path.expanduser(path)
+    if os.path.exists(path) and not exist_ok:
+        raise FileExistsError(f"file already exists: {path}")
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w') as f:
+        json.dump(stats, f)
+
+    
+def dumps_stats(stats: t_stats, indent: int = 2) -> str:
+    return json.dumps(stats, indent=indent)

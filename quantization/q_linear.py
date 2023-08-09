@@ -1,6 +1,13 @@
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, NamedTuple
 
 from .defs import *
+
+
+class LinearQuantizedResult(NamedTuple):
+    quantized_tensor: Union[t_Int8Tensor, t_Int32Tensor]
+    scale: t_scale
+    zero_point: t_zero_point
+    qc: QuantConfig
 
 
 def get_quantization_constants(qc: QuantConfig,
@@ -36,7 +43,7 @@ def get_quantization_constants_per_channel(tensor: t_Float32Tensor,
     scale_shape[qc.channel_dim] = -1
     scale = scale.view(scale_shape)
     zero_point = zero_point.view(scale_shape)
-    zero_point = 0 if qc.symmetric else zero_point
+    zero_point = 0 if (qc.symmetric and qc.signed) else zero_point
     return scale, zero_point
 
 
@@ -94,7 +101,7 @@ def linear_quantize(tensor: t_Float32Tensor,
                     scale: Optional[t_scale] = None,
                     zero_point: Optional[t_zero_point] = None,
                     dim: Optional[int] = None,
-                    dtype: t_dtype = t_int8) -> Tuple[t_Tensor, t_scale, t_zero_point]:
+                    dtype: t_dtype = t_int8) -> LinearQuantizedResult:
     """
     Linear quantize tensor, the function currently supports the all combination
     of the following policies:
@@ -136,4 +143,4 @@ def linear_quantize(tensor: t_Float32Tensor,
     assert scale is not None and zero_point is not None
 
     quantized_tensor = linear_quantize_asymmetric(tensor, scale, zero_point, qc, dtype)
-    return quantized_tensor, scale, zero_point
+    return LinearQuantizedResult(quantized_tensor, scale, zero_point, qc)

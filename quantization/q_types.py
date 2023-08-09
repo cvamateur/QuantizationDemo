@@ -1,5 +1,10 @@
 import torch
-from typing import Union, Optional, Callable, Any, Tuple
+import numpy as np
+from typing import Union, Optional, Callable, Tuple, Dict
+
+t_ndarray = np.ndarray
+
+t_Module = torch.nn.Module
 
 t_Tensor = torch.Tensor
 t_Int8Tensor = Union[torch.CharTensor, torch.cuda.CharTensor]
@@ -25,3 +30,5 @@ t_scale_fn = Callable[[t_Float32Tensor, Union[float, t_Float32Tensor]], t_Float3
 t_round_fn = Callable[[t_Float32Tensor], t_Float32Tensor]
 t_range_fn = Callable[[t_Float32Tensor, Optional[bool]], Tuple[float, float]]
 t_device = torch.device
+
+t_stats = Dict[str, Dict[str, float]]

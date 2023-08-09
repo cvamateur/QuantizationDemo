@@ -10,8 +10,9 @@ index   num bits    meaning
     1       1       linear(0) / non-linear(1)
     2       1       per-tensor(0) / per-channel(1)
     3       1       normal(0) / pow-of-two(1)
-  4-6       3       rounding policy
- 7-10       3       ranging policy
+  4-7       4       rounding policy
+ 8-11       4       ranging policy
+   15       1       signed(0) / unsigned(1)
 """
 
 #############################
@@ -24,31 +25,34 @@ Q_NO_LINEAR = 2  # not supported
 Q_PER_TENSOR = 0
 Q_PER_CHANNEL = 4
 Q_POWER_OF_TWO = 8
+Q_SIGNED = 0
+Q_UNSIGNED = 32768
 
 #########################
 #### Rounding Policy ####
 #########################
 ROUND_HALF_TO_EVEN = 0
-ROUND_HALF_AWAY_FROM_ZERO = 16      # 1 << 4
-ROUND_HALF_TOWARDS_ZERO = 32        # 2 << 4
-ROUND_HALF_DOWN = 48                # 3 << 4
-ROUND_HALF_UP = 64                  # 4 << 4
-DECODE_ROUNDING = 112               # 7 << 4
+ROUND_HALF_AWAY_FROM_ZERO = 16
+ROUND_HALF_TOWARDS_ZERO = 32
+ROUND_HALF_DOWN = 48
+ROUND_HALF_UP = 64
+DECODE_ROUNDING = 240
 
 ########################
 #### Ranging Policy ####
 ########################
 RANGE_ABSOLUTE = 0
-RANGE_QUANTILE = 128                # 1 << 7
-RANGE_KL_DIVERGENCE = 256           # 2 << 7
-RANGE_ACIQ = 384                    # 3 << 7
-DECODE_RANGING = 896                # 7 << 7
+RANGE_QUANTILE = 256
+RANGE_KL_DIVERGENCE = 512
+RANGE_ACIQ = 768
+DECODE_RANGING = 3840
 
 
 class QuantConfig(NamedTuple):
     bitwidth: int
     q_min: int
     q_max: int
+    signed: bool
     symmetric: bool
     per_channel: bool
     channel_dim: int
@@ -62,11 +66,18 @@ def make_policy(bitwidth: int, policy: int, channel_dim: int = 0):
     from quantization.basic_funcs import pow_of_two
 
     symmetrical = policy & Q_SYMMETRICAL
+    signed = ((policy >> 15) & 1) == 0
+
+    q_min = Q_MIN(bitwidth, signed)
+    q_max = Q_MAX(bitwidth, signed)
+    if symmetrical and signed:
+        q_min = -q_max
 
     return QuantConfig(
         bitwidth,
-        Q_MIN(bitwidth) if not symmetrical else -Q_MAX(bitwidth),
-        Q_MAX(bitwidth),
+        q_min,
+        q_max,
+        signed,
         symmetrical,
         policy & Q_PER_CHANNEL,
         0 if channel_dim is None else channel_dim,

@@ -2,8 +2,8 @@ import torch
 
 from common.net import MNIST_Net, VGG
 from common.dataloader import get_mnist_dataloader
-from quantization.utils.visualize import plot_tensor_histogram, plot_tensor_statistics
 from common.cli import get_parser
+from quantization.utils.visualize import plot_tensor_histogram, plot_tensor_statistics
 
 import quantization as q
 
@@ -13,7 +13,7 @@ DEVICE = torch.device("cuda" if USE_GPU else "cpu")
 vgg_path = r"./ckpt/vgg.cifar.pretrained.pth"
 ckpt_path = r"./ckpt/best.pth"
 
-USE_VGG = True
+USE_VGG = False
 
 def main(args):
     ds_train, ds_valid = get_mnist_dataloader(args)
@@ -27,8 +27,8 @@ def main(args):
         model.load_state_dict(torch.load(vgg_path)["state_dict"])
 
     # -------------------------------------------------
-    policy_weight = q.Q_ASYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
-    policy_weight = q.Q_SYMMETRICAL  | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
+    policy_weight = q.Q_ASYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE | q.Q_UNSIGNED
+    policy_weight = q.Q_SYMMETRICAL  | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE | q.Q_SIGNED
     policy_bias   = q.Q_SYMMETRICAL  | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
 
     bitwidth = 4
@@ -36,11 +36,11 @@ def main(args):
     count = 1
     for i, (name, m) in enumerate(model.named_modules()):
         if isinstance(m, torch.nn.Conv2d):
-            plot_tensor_histogram(m.weight, name, 32)
-            plot_tensor_statistics(m.weight, dim=0)
-            qw, s, z = q.linear_quantize(m.weight, bitwidth, policy_weight, dim=0)
+            res = q.linear_quantize(m.weight, bitwidth, policy_weight, dim=0)
+            plot_tensor_histogram(m.weight, name, res.qc)
+            plot_tensor_statistics(m.weight, name, dim=0)
             # qw, s, z = q.linear_quantize_weight_per_channel(m.weight, bitwidth, dim=0)
-            plot_tensor_histogram(qw, name, bitwidth)
+            plot_tensor_histogram(res.quantized_tensor, name, res.qc)
 
 
 
