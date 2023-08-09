@@ -35,6 +35,7 @@ from .q_policy import DECODE_ROUNDING
 from .q_policy import RANGE_ABSOLUTE
 from .q_policy import RANGE_QUANTILE
 from .q_policy import RANGE_KL_DIVERGENCE
+from .q_policy import RANGE_ACIQ
 from .q_policy import DECODE_RANGING
 from .q_policy import QuantConfig
 from .q_policy import PolicyRegister

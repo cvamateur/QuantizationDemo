@@ -4,6 +4,16 @@ from .q_types import t_scale_fn
 from .q_types import t_round_fn
 from .q_types import t_range_fn
 
+"""
+index   num bits    meaning
+    0       1       asymmetrical(0) / symmetrical(1)
+    1       1       linear(0) / non-linear(1)
+    2       1       per-tensor(0) / per-channel(1)
+    3       1       normal(0) / pow-of-two(1)
+  4-6       3       rounding policy
+ 7-10       3       ranging policy
+"""
+
 #############################
 #### Quantization Policy ####
 #############################
@@ -31,7 +41,8 @@ DECODE_ROUNDING = 112               # 7 << 4
 RANGE_ABSOLUTE = 0
 RANGE_QUANTILE = 128                # 1 << 7
 RANGE_KL_DIVERGENCE = 256           # 2 << 7
-DECODE_RANGING = 384                # 3 << 7
+RANGE_ACIQ = 384                    # 3 << 7
+DECODE_RANGING = 896                # 7 << 7
 
 
 class QuantConfig(NamedTuple):

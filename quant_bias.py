@@ -1,10 +1,7 @@
-import time
-
 import torch
 import torch.nn as nn
 from common.net import MNIST_Net, VGG
 from common.dataloader import get_mnist_dataloader, get_cifar10_dataset
-from common.visualize import plot_weight_distribution
 from common.cli import get_parser
 
 import quantization as q

@@ -1,10 +1,8 @@
-import time
-
 import torch
 
 from common.net import MNIST_Net, VGG
 from common.dataloader import get_mnist_dataloader
-from common.visualize import plot_weight_distribution
+from quantization.utils.visualize import plot_tensor_histogram, plot_tensor_statistics
 from common.cli import get_parser
 
 import quantization as q
@@ -38,10 +36,13 @@ def main(args):
     count = 1
     for i, (name, m) in enumerate(model.named_modules()):
         if isinstance(m, torch.nn.Conv2d):
-            plot_weight_distribution(m.weight, name, 32)
+            plot_tensor_histogram(m.weight, name, 32)
+            plot_tensor_statistics(m.weight, dim=0)
             qw, s, z = q.linear_quantize(m.weight, bitwidth, policy_weight, dim=0)
             # qw, s, z = q.linear_quantize_weight_per_channel(m.weight, bitwidth, dim=0)
-            plot_weight_distribution(qw, name, bitwidth)
+            plot_tensor_histogram(qw, name, bitwidth)
+
+
 
 
 if __name__ == '__main__':

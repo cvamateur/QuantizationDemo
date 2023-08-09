@@ -1,10 +1,7 @@
-import time
-
 import torch
 
 from common.net import MNIST_Net, VGG
 from common.dataloader import get_mnist_dataloader, get_cifar10_dataset
-from common.visualize import plot_weight_distribution
 from common.cli import get_parser
 
 import quantization as q
@@ -33,8 +30,10 @@ def main(args):
     bitwidth: int = 8
 
     stats_inp, stats_out = q.calibrate_activations(model, ds_valid, policy_activation)
-    print(stats_inp)
-    print(stats_out)
+
+    from pprint import pprint
+    pprint(stats_inp)
+    pprint(stats_out)
 
 
 

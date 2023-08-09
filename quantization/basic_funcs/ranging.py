@@ -7,10 +7,10 @@ from ..q_policy import (
     RANGE_ABSOLUTE,
     RANGE_QUANTILE,
     RANGE_KL_DIVERGENCE,
+    RANGE_ACIQ,
 )
 
 from ..q_types import t_Float32Tensor
-
 
 RANGE_REGISTER = PolicyRegister("Range")
 
@@ -54,4 +54,9 @@ def range_quantile_max(t: t_Float32Tensor, symmetrical: bool = True) -> Tuple[fl
 
 @RANGE_REGISTER(RANGE_KL_DIVERGENCE)
 def range_kl_divergence(t: t_Float32Tensor, symmetrical: bool = True) -> Tuple[float, float]:
+    raise NotImplementedError
+
+
+@RANGE_REGISTER(RANGE_ACIQ)
+def range_aciq(t: t_Float32Tensor, symmetrical: bool = False) -> Tuple[float, float]:
     raise NotImplementedError
