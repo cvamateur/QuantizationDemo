@@ -29,7 +29,7 @@ def plot_tensor_histogram(weights, name, bitwidth=32):
     plt.show()
 
 
-def plot_tensor_statistics(tensor, dim: int = None, style: str = "seaborn-v0_8-dark"):
+def plot_tensor_statistics(tensor, dim: int = None, style: str = "seaborn-v0_8"):
     if isinstance(tensor, q.t_Tensor):
         tensor = tensor.detach().cpu().numpy()
     assert isinstance(tensor, np.ndarray), "error: input must be numpy.array"
