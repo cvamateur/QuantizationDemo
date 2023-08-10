@@ -2,7 +2,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ..funcs import Q_MIN, Q_MAX
+from ..functional import Q_MIN, Q_MAX
 from ..q_types import t_Tensor, t_ndarray
 
 def print_styles():

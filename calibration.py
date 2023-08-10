@@ -26,7 +26,8 @@ def main(args):
         ds_train, ds_valid = get_cifar10_dataset(args)
 
     # -------------------------------------------------
-    policy_activation = q.Q_SYMMETRICAL | q.RANGE_ABSOLUTE
+    policy_activation = q.RANGE_ABSOLUTE
+    policy_activation = q.RANGE_QUANTILE
     bitwidth: int = 8
 
     stats_inp, stats_out = q.calibrate_activations(model, ds_valid, policy_activation)
@@ -35,8 +36,8 @@ def main(args):
     pprint(stats_inp)
     pprint(stats_out)
 
-    q.dump_stats(stats_inp, "./out/stats_inputs.json", indent=2)
-    q.dump_stats(stats_out, "./out/stats_outputs.json", indent=2)
+    q.dump_stats(stats_inp, "out/vgg/stats_inputs.json", indent=2)
+    q.dump_stats(stats_out, "out/vgg/stats_outputs.json", indent=2)
 
 
 

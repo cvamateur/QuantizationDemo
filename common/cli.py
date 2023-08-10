@@ -16,6 +16,6 @@ def get_parser():
     parser.add_argument("--batch-size", type=int, default=64, metavar="N")
     parser.add_argument("--num-epochs", type=int, default=20, metavar="N")
     parser.add_argument("--lr", type=float, default=1e-3, metavar="LR")
-    parser.add_argument("--weight-decay", type=float, default=1e-4, help="Weight decay for L2 regularization")
+    parser.add_argument("--weight-decay", type=float, default=1e-5, help="Weight decay for L2 regularization")
 
     return parser

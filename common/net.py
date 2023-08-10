@@ -64,21 +64,22 @@ class MNIST_Net(nn.Module):
                 feature_extractor.append(nn.MaxPool2d(3, 2, 1))
             elif isinstance(out_channels, int):
                 out_channels = int(round(factor * out_channels))
-                feature_extractor.append(block(in_channels, out_channels, 3, 1, 1))
+                feature_extractor.append(nn.Conv2d(in_channels, out_channels, 3, 1, 1))
+                feature_extractor.append(nn.ReLU(inplace=True))
+                # feature_extractor.append(block(in_channels, out_channels, 3, 1, 1))
                 in_channels = out_channels
             else:
                 msg = f"error: modules plan got unknown parameter: {out_channels}"
                 raise ValueError(msg)
+        feature_extractor.append(nn.AdaptiveAvgPool2d(1))
 
-        self.extractor = nn.Sequential(*feature_extractor)
-        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.backbone = nn.Sequential(*feature_extractor)
         self.classifier = nn.Linear(in_channels, 10)
 
         self._init_params()
 
     def forward(self, x):
-        x = self.extractor(x)
-        x = self.pool(x)
+        x = self.backbone(x)
         x = x.view(x.shape[0], -1)
         x = self.classifier(x)
         return x
