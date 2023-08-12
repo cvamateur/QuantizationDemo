@@ -36,8 +36,8 @@ def main(args):
     pprint(stats_inp)
     pprint(stats_out)
 
-    q.dump_stats(stats_inp, "out/vgg/stats_inputs.json", indent=2)
-    q.dump_stats(stats_out, "out/vgg/stats_outputs.json", indent=2)
+    q.dump_stats(stats_inp, "Output/vgg/stats_inputs.json", indent=2)
+    q.dump_stats(stats_out, "Output/vgg/stats_outputs.json", indent=2)
 
 
 

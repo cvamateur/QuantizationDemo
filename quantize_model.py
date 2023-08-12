@@ -3,6 +3,7 @@ import os.path
 
 import torch
 import torch.nn as nn
+import torch.ao
 
 from tqdm import tqdm
 
@@ -25,8 +26,8 @@ USE_VGG = True
 def quantize_model(model: q.t_Module, calib_data) -> q.t_Module:
     if USE_VGG:
         policy_weight     = q.Q_SYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
-        policy_activation = q.Q_SYMMETRICAL
-        policy_bias       = q.Q_SYMMETRICAL | q.RANGE_QUANTILE
+        policy_activation = q.Q_ASYMMETRICAL | q.RANGE_QUANTILE
+        policy_bias       = q.Q_SYMMETRICAL
     else:
         policy_weight     = q.Q_SYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
         policy_activation = q.Q_SYMMETRICAL
@@ -41,8 +42,8 @@ def quantize_model(model: q.t_Module, calib_data) -> q.t_Module:
     qc_b = q.make_policy(bitwidth_bias, policy_bias)
 
     # Calibrate activations
-    input_stats_path = f"out/{'vgg' if USE_VGG else 'mnist'}/stats_inputs.json"
-    output_stats_path = f"out/{'vgg' if USE_VGG else 'mnist'}/stats_outputs.json"
+    input_stats_path = f"Output/{'vgg' if USE_VGG else 'mnist'}/stats_inputs.json"
+    output_stats_path = f"Output/{'vgg' if USE_VGG else 'mnist'}/stats_outputs.json"
     if not os.path.isfile(input_stats_path) or not os.path.isfile(output_stats_path):
         input_stats, output_stats = q.calibrate_activations(model, calib_data, policy_bias, 50)
         q.dump_stats(input_stats, input_stats_path, indent=2)
@@ -202,3 +203,4 @@ def main(args):
 if __name__ == '__main__':
     args = get_parser().parse_args()
     main(args)
+
