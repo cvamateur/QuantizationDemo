@@ -26,7 +26,7 @@ USE_VGG = True
 def quantize_model(model: q.t_Module, calib_data) -> q.t_Module:
     if USE_VGG:
         policy_weight     = q.Q_SYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE
-        policy_activation = q.Q_ASYMMETRICAL | q.RANGE_QUANTILE
+        policy_activation = q.Q_SYMMETRICAL | q.RANGE_ABSOLUTE
         policy_bias       = q.Q_SYMMETRICAL
     else:
         policy_weight     = q.Q_SYMMETRICAL | q.Q_PER_CHANNEL | q.RANGE_ABSOLUTE

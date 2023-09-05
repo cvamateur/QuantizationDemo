@@ -17,6 +17,9 @@ def get_quantization_constants(qc: QuantConfig,
     Get quantization scale and zero_point for single tensor.
     """
     q_min, q_max = qc.q_min, qc.q_max
+    if qc.symmetric:
+        r_max = max(abs(r_min), abs(r_max))
+        r_min = -r_max
     scale = (r_max - r_min) / (q_max - q_min)
     zero_point = q_min - r_min / scale
     if zero_point < q_min:
